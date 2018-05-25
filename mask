@@ -1,0 +1,65 @@
+https://plnkr.co/edit/TWUCyonAHYI5v57OuqEO?p=preview
+
+
+import { Component, OnInit } from '@angular/core';
+import { CreditCardService } from './credit-card.service';
+
+@Component({
+  selector: 'app-credit-card',
+  template: `
+    <p>Your credit card is: {{ creditCardNumber | creditCardMask }}</p>
+  `
+})
+export class CreditCardComponent implements OnInit {
+  creditCardNumber: string;
+
+  constructor(private creditCardService: CreditCardService) {}
+
+  ngOnInit() {
+    this.creditCardNumber = this.creditCardService.getCreditCard();
+  }
+}
+
+--------------------------------------------------------------------------
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { CreditCardMaskPipe } from './credit-card-mask.pipe';
+import { CreditCardService } from './credit-card.service';
+import { CreditCardComponent } from './credit-card.component';
+
+@NgModule({
+  imports: [CommonModule],
+  declarations: [
+    CreditCardMaskPipe,
+    CreditCardComponent
+  ],
+  providers: [CreditCardService],
+  exports: [CreditCardComponent]
+})
+export class CreditCardModule {}
+-----------------------------------------------------------------
+
+
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'creditCardMask'
+})
+export class CreditCardMaskPipe implements PipeTransform {
+  transform(plainCreditCard: string): string {
+    const visibleDigits = 4;
+    let maskedSection = plainCreditCard.slice(0, -visibleDigits);
+    let visibleSection = plainCreditCard.slice(-visibleDigits);
+    return maskedSection.replace(/./g, 'X') + visibleSection;
+  }
+}
+--------------------------------------------
+import { Injectable } from '@angular/core';
+
+@Injectable()
+export class CreditCardService {
+  getCreditCard(): string {
+    return '2131313133123174098';
+  }
+}
